@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: smartcompare-db
+    environment:
+      POSTGRES_DB: smartcompare
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+
+    ports:
+      - "5555:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./setup_database.sql:/docker-entrypoint-initdb.d/setup_database.sql
+    restart: unless-stopped
+  backend:
+    image: smartcompare-backend
+    depends_on:
+      - postgres
+    environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+        SPRING_DATASOURCE_USERNAME: postgres
+        SPRING_DATASOURCE_PASSWORD: 1234
+        SERVER_PORT: 8080
+        APPLICATION_NAME: smartcompare
+        JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+        JWT_EXPIRATION: 86400000
+        LOG_LEVEL_SPRING_SECURITY: DEBUG
+        LOG_LEVEL_APP: DEBUG
+        EBAY_API_CLIENT_ID: JoseRoja-SmartCom-PRD-bf04600b9-b3f9d69b
+        EBAY_API_CLIENT_SECRET: PRD-f04600b97f00-3d8e-469a-ae32-f056
+        EBAY_API_BASE_URL: https://api.ebay.com
+        EBAY_API_BROWSE_ENDPOINT: /buy/browse/v1/item_summary/search
+        EBAY_API_TOKEN_URL: https://api.ebay.com/identity/v1/oauth2/token
+        MAIL_SMPT_USERNAME: nicolas.vasquezdevel@utec.edu.pe
+        MAIL_SMPT_PASSWORD: aqji gjyw tnbb rifg
+        MAIL_FROM: nicolas.vasquezdevel@utec.edu.pe
+    ports:
+      - "8080:8080"
+volumes:
+  postgres_data:
+
